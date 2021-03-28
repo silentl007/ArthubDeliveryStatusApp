@@ -14,6 +14,7 @@ class _StatusState extends State<Status> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   var getorderdetails;
   var userID = '';
+  var jsonData;
   String accountType = '';
   String clearAgentID = 'Test Agent ID';
   static const purple = Color.fromRGBO(69, 56, 133, 1);
@@ -29,10 +30,10 @@ class _StatusState extends State<Status> {
         'https://arthubserver.herokuapp.com/apiR/orderdetails/${widget.orderID}';
     try {
       var data = await http.get(link);
-      var jsonData = jsonDecode(data.body);
-        userID = jsonData['userID'];
-        accountType = jsonData['accountType'];
-        return jsonData;
+      jsonData = jsonDecode(data.body);
+      userID = jsonData['userID'];
+      accountType = jsonData['accountType'];
+      return data.statusCode;
     } catch (e) {
       print('here at catch - $e');
       return null;
@@ -60,56 +61,51 @@ class _StatusState extends State<Status> {
                   ],
                 ),
               );
-            } else if (snapshot.hasData) {
+            } else if (snapshot.data == 200) {
               return Container(
-                  child: snapshot.data != {}
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Card(
-                              child: ListTile(
-                                title: snapshot.data['status'] == 'Pending'
-                                    ? text(Colors.red, 'Pending')
-                                    : text(Colors.green, 'Delivered'),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Name: ${snapshot.data['username']}'),
-                                    Text(
-                                        'Date Ordered: ${snapshot.data['dateOrdered']}'),
-                                    Text(
-                                        'No. of items: ${snapshot.data['itemnumber']}'),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Center(
-                              child: RaisedButton(
-                                onPressed: () {
-                                  if (snapshot.data['status'] == 'Delivered') {
-                                    snackbar('Already delivered');
-                                  } else {
-                                    diag();
-                                  }
-                                },
-                                child: Text(
-                                  'Confirm Delivery',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.white),
-                                ),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(50))),
-                                color: purple,
-                              ),
-                            )
-                          ],
-                        )
-                      : Center(
-                          child: Text(
-                            'No record found for this order ID - ${widget.orderID}',
-                          ),
-                        ));
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Card(
+                    child: ListTile(
+                      title: jsonData['status'] == 'Pending'
+                          ? text(Colors.red, 'Pending')
+                          : text(Colors.green, 'Delivered'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Name: ${jsonData['username']}'),
+                          Text('Date Ordered: ${jsonData['dateOrdered']}'),
+                          Text('No. of items: ${jsonData['itemnumber']}'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: RaisedButton(
+                      onPressed: () {
+                        if (snapshot.data['status'] == 'Delivered') {
+                          snackbar('Already delivered');
+                        } else {
+                          diag();
+                        }
+                      },
+                      child: Text(
+                        'Confirm Delivery',
+                        style: TextStyle(fontSize: 15, color: Colors.white),
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(50))),
+                      color: purple,
+                    ),
+                  )
+                ],
+              ));
+            } else if (snapshot.data == 404) {
+              return Center(
+                  child: Text(
+                'No record found for the order ID',
+              ));
             } else {
               return Center(
                 child: RaisedButton(
