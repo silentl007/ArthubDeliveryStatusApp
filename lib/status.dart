@@ -14,6 +14,7 @@ class _StatusState extends State<Status> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   var getorderdetails;
   var userID = '';
+  var username = '';
   var jsonData;
   String accountType = '';
   String clearAgentID = 'Test Agent ID';
@@ -163,9 +164,11 @@ class _StatusState extends State<Status> {
 
   deliver() async {
     Map body = {
-      'userID': userID,
+      'userID': jsonData['userID'],
       'orderID': widget.orderID,
-      'accountType': accountType,
+      'useremail': jsonData['useremail'],
+      'username': jsonData['username'],
+      'accountType': jsonData['accountType'],
       'clearAgentID': clearAgentID
     };
     var encodedData = jsonEncode(body);
