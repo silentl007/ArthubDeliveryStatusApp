@@ -78,6 +78,7 @@ class _StatusState extends State<Status> {
                           Text('Name: ${jsonData['username']}'),
                           Text('Date Ordered: ${jsonData['dateOrdered']}'),
                           Text('No. of items: ${jsonData['itemnumber']}'),
+                          Text('No. of items: ${jsonData['useremail']}'),
                         ],
                       ),
                     ),
@@ -85,7 +86,7 @@ class _StatusState extends State<Status> {
                   Center(
                     child: RaisedButton(
                       onPressed: () {
-                        if (snapshot.data['status'] == 'Delivered') {
+                        if (jsonData['status'] == 'Delivered') {
                           snackbar('Already delivered');
                         } else {
                           diag();
